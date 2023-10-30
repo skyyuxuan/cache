@@ -3,14 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Xuan.Cache
+namespace Xuan.Cache.Storage
 {
     /// <summary>
-    /// ICacheRepository
+    /// IEntityCache
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    public interface ICacheRepository<TKey, TValue>
+    public interface IEntityCache<TKey, TValue>
     {
         /// <summary>
         /// 保存
