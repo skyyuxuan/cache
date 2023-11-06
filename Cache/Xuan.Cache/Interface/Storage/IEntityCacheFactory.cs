@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xuan.Cache.Model.Storage;
 
 namespace Xuan.Cache.Storage
 {
@@ -16,8 +17,8 @@ namespace Xuan.Cache.Storage
         /// </summary>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
-        /// <param name="cacheInstance"></param>
+        /// <param name="option"></param>
         /// <returns></returns>
-        IEntityCache<TKey, TValue> CreateEntityCache<TKey, TValue>(string cacheInstance) where TValue : class;
+        IEntityCache<TKey, TValue> CreateEntityCache<TKey, TValue>(EntityCacheOption option) where TValue : class;
     }
 }

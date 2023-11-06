@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xuan.Cache.Model.Storage;
 
 namespace Xuan.Cache.Storage
 {
@@ -19,11 +20,11 @@ namespace Xuan.Cache.Storage
             _configuration = configuration;
         }
 
-        ///<seealso cref="IEntityCacheFactory.CreateEntityCache{TKey, TValue}(string)"/>
-        public IEntityCache<TKey, TValue> CreateEntityCache<TKey, TValue>(string cacheInstance) where TValue : class
+        ///<seealso cref="IEntityCacheFactory.CreateEntityCache{TKey, TValue}(EntityCacheOption)"/>
+        public IEntityCache<TKey, TValue> CreateEntityCache<TKey, TValue>(EntityCacheOption option) where TValue : class
         {
             var redisCache = _redisFactory.CreateProvider(_configuration.InstanceName);
-            return new StackExchangeRedisEntityCache<TKey, TValue>(redisCache, _serializer, _configuration, cacheInstance);
+            return new StackExchangeRedisEntityCache<TKey, TValue>(redisCache, _serializer, _configuration, option.EntityName);
         }
     }
 }
