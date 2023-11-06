@@ -19,6 +19,6 @@ namespace Xuan.Cache.Storage
         /// <typeparam name="TValue"></typeparam>
         /// <param name="option"></param>
         /// <returns></returns>
-        IEntityCache<TKey, TValue> CreateEntityCache<TKey, TValue>(EntityCacheOption option) where TValue : class;
+        IEntityCache<TKey, TValue> CreateEntityCache<TKey, TValue>(EntityCacheOptions option) where TValue : class;
     }
 }

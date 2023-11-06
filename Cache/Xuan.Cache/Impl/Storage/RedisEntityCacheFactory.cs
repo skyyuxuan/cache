@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,21 +11,16 @@ namespace Xuan.Cache.Storage
     ///<seealso cref="IEntityCacheFactory"/>
     public class RedisEntityCacheFactory : IEntityCacheFactory
     {
-        private readonly IRedisProviderFactory _redisFactory;
-        private readonly ICacheSerializer _serializer;
-        private readonly ICacheServiceConfiguration _configuration;
-        public RedisEntityCacheFactory(IRedisProviderFactory redisFactory, ICacheSerializer serializer, ICacheServiceConfiguration configuration)
+        private readonly IServiceProvider _serviceProvider;
+        public RedisEntityCacheFactory(IServiceProvider serviceProvider)
         {
-            _redisFactory = redisFactory;
-            _serializer = serializer;
-            _configuration = configuration;
+            _serviceProvider = serviceProvider;
         }
 
-        ///<seealso cref="IEntityCacheFactory.CreateEntityCache{TKey, TValue}(EntityCacheOption)"/>
-        public IEntityCache<TKey, TValue> CreateEntityCache<TKey, TValue>(EntityCacheOption option) where TValue : class
+        ///<seealso cref="IEntityCacheFactory.CreateEntityCache{TKey, TValue}(EntityCacheOptions)"/>
+        public IEntityCache<TKey, TValue> CreateEntityCache<TKey, TValue>(EntityCacheOptions option) where TValue : class
         {
-            var redisCache = _redisFactory.CreateProvider(_configuration.InstanceName);
-            return new StackExchangeRedisEntityCache<TKey, TValue>(redisCache, _serializer, _configuration, option.EntityName);
+            return (IEntityCache<TKey, TValue>)ActivatorUtilities.CreateInstance(_serviceProvider, typeof(StackExchangeRedisEntityCache<TKey, TValue>), option);
         }
     }
 }

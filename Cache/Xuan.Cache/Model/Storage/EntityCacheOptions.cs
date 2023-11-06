@@ -9,12 +9,12 @@ namespace Xuan.Cache.Model.Storage
     /// <summary>
     /// EntityCacheOption
     /// </summary>
-    public class EntityCacheOption
+    public class EntityCacheOptions
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        private EntityCacheOption()
+        private EntityCacheOptions()
         {
 
         }
@@ -30,7 +30,7 @@ namespace Xuan.Cache.Model.Storage
 
         public class Builder
         {
-            private EntityCacheOption option = new EntityCacheOption()
+            private EntityCacheOptions options = new EntityCacheOptions()
             {
 
             };
@@ -42,7 +42,7 @@ namespace Xuan.Cache.Model.Storage
             /// <returns></returns>
             public Builder EntityName(string entityName)
             {
-                option.EntityName = entityName;
+                options.EntityName = entityName;
                 return this;
             }
 
@@ -53,7 +53,7 @@ namespace Xuan.Cache.Model.Storage
             /// <returns></returns>
             public Builder Serializer(string serializer)
             {
-                option.Serializer = serializer;
+                options.Serializer = serializer;
                 return this;
             }
 
@@ -61,9 +61,9 @@ namespace Xuan.Cache.Model.Storage
             /// Build
             /// </summary>
             /// <returns></returns>
-            public EntityCacheOption Build()
+            public EntityCacheOptions Build()
             {
-                return option;
+                return options;
             }
         }
     }

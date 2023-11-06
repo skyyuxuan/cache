@@ -1,10 +1,12 @@
-﻿using StackExchange.Redis;
+﻿using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Xuan.Cache.Model.Storage;
 
 namespace Xuan.Cache.Storage
 {
@@ -13,20 +15,21 @@ namespace Xuan.Cache.Storage
     {
         private readonly IRedisProvider _cache;
         private readonly ICacheSerializer _serializer;
-        private readonly ICacheServiceConfiguration _configuration;
-        private readonly string _cacheInstance;
+        private readonly RedisEntityCacheOptions _options;
+        private readonly EntityCacheOptions _entityCacheOptions;
 
         /// <summary>
         /// RedisEntityCache
-        /// </summary> 
-        /// <param name="serializer"></param>
-        /// <param name="configuration"></param>
-        public StackExchangeRedisEntityCache(IRedisProvider cache, ICacheSerializer serializer, ICacheServiceConfiguration configuration, string cacheInstance)
+        /// </summary>
+        /// <param name="cache"></param>
+        /// <param name="options"></param>
+        /// <param name="entityCacheOptions"></param>
+        public StackExchangeRedisEntityCache(IRedisProvider cache, IOptions<RedisEntityCacheOptions> options, EntityCacheOptions entityCacheOptions)
         {
-            _configuration = configuration;
             _cache = cache;
-            _serializer = serializer;
-            _cacheInstance = cacheInstance;
+            _options = options.Value;
+            _entityCacheOptions = entityCacheOptions;
+            //_serializer
         }
 
         public async Task<bool> SaveCacheAsync(TKey key, TValue value, TimeSpan? expireTime)
@@ -61,7 +64,7 @@ namespace Xuan.Cache.Storage
             var semaphore = new SemaphoreSlim(1);
             try
             {
-                CacheServiceInternalHelper.BatchInvoke(values, _configuration.MaxParallelCache, async (saveValues) =>
+                CacheServiceInternalHelper.BatchInvoke(values, _options.MaxParallelCache, async (saveValues) =>
                 {
                     try
                     {
@@ -134,7 +137,7 @@ namespace Xuan.Cache.Storage
             var dataValues = new List<TValue>();
             try
             {
-                CacheServiceInternalHelper.BatchInvoke<RedisKey>(effectiveCacheKeys, _configuration.MaxParallelCache, async (rKeys) =>
+                CacheServiceInternalHelper.BatchInvoke<RedisKey>(effectiveCacheKeys, _options.MaxParallelCache, async (rKeys) =>
                 {
                     try
                     {
@@ -185,17 +188,6 @@ namespace Xuan.Cache.Storage
         }
 
         /// <summary>
-        /// 返回缓存的配置
-        /// </summary>
-        /// <returns></returns>
-        protected virtual TimeSpan? GetExpireTime()
-        {
-            if (!_configuration.ExpireTimeToExclusive.HasValue || !_configuration.ExpireTimeFromInclusive.HasValue)
-                return null;
-            return TimeSpan.FromSeconds(RandomNumberGenerator.GetInt32(_configuration.ExpireTimeFromInclusive.Value, _configuration.ExpireTimeToExclusive.Value));
-        }
-
-        /// <summary>
         /// Get IDatabase
         /// </summary>
         /// <returns></returns>
@@ -218,8 +210,7 @@ namespace Xuan.Cache.Storage
         protected virtual string GetCacheKey(TKey key)
         {
             string cacheKey = key.ToString();
-            string useCompress = _configuration.UseCompress ? $":{CacheConstants.CacheCompress}" : "";
-            return $"{{{CacheConstants.CacheServiceName}:{_configuration.InstanceName}:{CacheConstants.CacheEntityName}{useCompress}:{_cacheInstance}}}:{cacheKey}";
+            return $"{{{CacheConstants.CacheServiceName}:{_options.InstanceName}:{CacheConstants.CacheEntityName}:{_entityCacheOptions.EntityName}}}:{cacheKey}";
         }
 
         /// <summary>
